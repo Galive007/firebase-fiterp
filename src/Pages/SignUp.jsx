@@ -1,8 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MyContainer from '../Component/MyContainer';
 import { Link } from 'react-router';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../Firebase/firebase.init';
+import { toast } from 'react-toastify';
+import { FaEye, FaEyeSlash, FaRegEyeSlash } from 'react-icons/fa';
 
 const SignUp = () => {
+    const [error, setError] = useState('')
+    const [show, setShow] = useState(false)
+
+    const handleSignUp = (e) => {
+        e.preventDefault()
+        console.log('clicked');
+        const email = e.target.email.value;
+        const password = e.target.password.value
+        console.log({ email, password });
+        if (password.length < 6) {
+            toast.error('Password should be at least 6 digits')
+            return
+        }
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",<.>/?\\|`~]).{6,}$/;
+        if (!passwordRegex.test(password)) {
+            setError('Password must be at least 6 characters, include one uppercase, one lowercase, and one special character.')
+            return
+        }
+        setError('')
+        createUserWithEmailAndPassword(auth, email, password)
+            .then(result => {
+                console.log(result);
+                toast.success('SignUp Successfully')
+
+            })
+            .catch(err => {
+                const error = err.message;
+                setError(error)
+                toast.error('SignUp Not Successfully', error)
+            })
+    }
+
     return (
         <div className="min-h-[96vh] flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 relative overflow-hidden">
             {/* Animated floating circles */}
@@ -28,7 +64,7 @@ const SignUp = () => {
                             Sign Up
                         </h2>
 
-                        <form className="space-y-4">
+                        <form onSubmit={handleSignUp} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium mb-1">Email</label>
                                 <input
@@ -44,23 +80,22 @@ const SignUp = () => {
                                     Password
                                 </label>
                                 <input
-                                    type="password"
+                                    type={show ? 'text' : "password"}
                                     name="password"
                                     placeholder="••••••••"
                                     className="input input-bordered w-full bg-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-pink-400"
                                 />
-                                <span
-
-                                    className="absolute right-[8px] top-[36px] cursor-pointer z-50"
-                                >
-
+                                <span onClick={() => setShow(!show)} className="absolute right-[8px] top-[36px] cursor-pointer z-50" >
+                                    {show ? <FaEye /> : <FaRegEyeSlash />}
                                 </span>
                             </div>
 
                             <button type="submit" className="my-btn">
                                 Sign Up
                             </button>
-
+                            <div>
+                                <p>{error}</p>
+                            </div>
                             <div className="text-center mt-3">
                                 <p className="text-sm text-white/80">
                                     Already have an account?{" "}
