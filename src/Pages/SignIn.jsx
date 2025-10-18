@@ -28,8 +28,38 @@ const SignIn = () => {
                 toast.success('SignIn Successfully')
             })
             .catch(err => {
-                console.log(err.message);
-                toast.error('SignIn Unsuccessful')
+                console.log(err.code);
+
+                if (err.code === 'auth/invalid-email') {
+                    toast.error('Invalid email format');
+                }
+                else if (err.code === 'auth/user-disabled') {
+                    toast.error('This user account has been disabled');
+                }
+                else if (err.code === 'auth/user-not-found') {
+                    toast.error('No user found with this email');
+                }
+                else if (err.code === 'auth/wrong-password') {
+                    toast.error('Incorrect password');
+                }
+                else if (err.code === 'auth/too-many-requests') {
+                    toast.error('Too many failed attempts. Try again later.');
+                }
+                else if (err.code === 'auth/network-request-failed') {
+                    toast.error('Network error. Please check your internet connection.');
+                }
+                else if (err.code === 'auth/popup-closed-by-user') {
+                    toast.error('Popup closed before sign-in completed');
+                }
+                else if (err.code === 'auth/account-exists-with-different-credential') {
+                    toast.error('Account exists with a different sign-in method');
+                }
+                else if (err.code === 'auth/invalid-credential') {
+                    toast.error('Invalid credentials. Please try again.');
+                }
+                else {
+                    toast.error('Something went wrong: ' + err.message);
+                }
             })
     }
     // console.log(user);
@@ -49,8 +79,8 @@ const SignIn = () => {
                 toast.success('SignIn Successfully')
             })
             .catch(err => {
-                console.log(err.message);
-                toast.error('SignIn Unsuccessful')
+                console.log(err.code);
+
             })
     }
     return (
