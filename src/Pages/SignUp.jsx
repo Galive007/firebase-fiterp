@@ -16,13 +16,10 @@ const SignUp = () => {
         const email = e.target.email.value;
         const password = e.target.password.value
         console.log({ email, password });
-        if (password.length < 6) {
-            toast.error('Password should be at least 6 digits')
-            return
-        }
+
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[{\]};:'",<.>/?\\|`~]).{6,}$/;
         if (!passwordRegex.test(password)) {
-            setError('Password must be at least 6 characters, include one uppercase, one lowercase, and one special character.')
+            toast.error('Password must be at least 6 characters, include one uppercase, one lowercase, and one special character.')
             return
         }
         setError('')
@@ -35,7 +32,38 @@ const SignUp = () => {
             .catch(err => {
                 const error = err.message;
                 setError(error)
-                toast.error('SignUp Not Successfully', error)
+                // console.log(err.code);
+                // toast.error('SignUp Not Successfully', error)
+                if (err.code === 'auth/email-already-in-use') {
+                    toast.error('Email already exists in database');
+                }
+                else if (err.code === 'auth/weak-password') {
+                    toast.error('Weak password. Use at least 6 characters.');
+                }
+                else if (err.code === 'auth/invalid-email') {
+                    toast.error('Invalid email format');
+                }
+                else if (err.code === 'auth/user-not-found') {
+                    toast.error('User not found. Please register first.');
+                }
+                else if (err.code === 'auth/wrong-password') {
+                    toast.error('Incorrect password');
+                }
+                else if (err.code === 'auth/too-many-requests') {
+                    toast.error('Too many attempts. Try again later.');
+                }
+                else if (err.code === 'auth/network-request-failed') {
+                    toast.error('Network error. Please check your connection.');
+                }
+                else if (err.code === 'auth/popup-closed-by-user') {
+                    toast.error('Popup closed before sign-in completed.');
+                }
+                else if (err.code === 'auth/account-exists-with-different-credential') {
+                    toast.error('Account exists with a different sign-in method.');
+                }
+                else {
+                    toast.error('Something went wrong: ' + error);
+                }
             })
     }
 
@@ -93,9 +121,7 @@ const SignUp = () => {
                             <button type="submit" className="my-btn">
                                 Sign Up
                             </button>
-                            <div>
-                                <p>{error}</p>
-                            </div>
+
                             <div className="text-center mt-3">
                                 <p className="text-sm text-white/80">
                                     Already have an account?{" "}
